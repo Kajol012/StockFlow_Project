@@ -1,0 +1,1 @@
+<?php require_once '../includes/auth.php'; require_role('Inventory Manager'); require '../config/database.php'; require '../app/controllers/InventoryController.php'; (new InventoryController($pdo))->stockOut();
