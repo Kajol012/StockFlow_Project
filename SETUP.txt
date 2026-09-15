@@ -1,0 +1,7 @@
+StockFlow Purchase Officer standalone setup
+
+1. Put StockFlow in C:\xampp\htdocs\StockFlow
+2. Start Apache and MySQL.
+3. Import database/StockSystem.sql in phpMyAdmin.
+4. Visit http://localhost/StockFlow/
+5. Login: purchase officer / 333

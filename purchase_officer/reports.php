@@ -1,0 +1,1 @@
+<?php require_once '../includes/auth.php'; require_role('Purchase Officer'); require '../config/database.php'; require '../app/controllers/PurchaseController.php'; (new PurchaseController($pdo))->reports();
