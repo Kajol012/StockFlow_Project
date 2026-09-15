@@ -1,0 +1,29 @@
+<?php
+require_once __DIR__ . '/../models/AdminModel.php';
+require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../models/ProductModel.php';
+require_once __DIR__ . '/../models/CategoryModel.php';
+
+class AdminController {
+    public function __construct(private PDO $pdo) {}
+    public function dashboard(): void { $model=new AdminModel($this->pdo);$stats=$model->dashboardStats();$low=$model->lowStock();$recent=$model->recentActivity();$title='Admin Dashboard';require __DIR__.'/../views/admin/dashboard.php'; }
+    public function users(): void { $model=new UserModel($this->pdo);$roles=['Admin','Inventory Manager','Sales Staff','Purchase Officer'];$statuses=['Active','Inactive'];$edit=null;
+        if(isset($_GET['edit'])){$edit=$model->find((int)$_GET['edit']);if(!$edit){flash('error','User not found.');redirect_to(project_base_url().'/admin/users.php');}}
+        if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_id'])){ verify_csrf(); $id=(int)$_POST['delete_id']; if($id===(int)$_SESSION['user']['id']){flash('error','You cannot delete your own account.');}else{try{$model->delete($id);flash('success','User deleted successfully.');}catch(PDOException $e){flash('error','User cannot be deleted because this account has related records.');}} redirect_to(project_base_url().'/admin/users.php'); }
+        if($_SERVER['REQUEST_METHOD']==='POST'){
+            verify_csrf();$id=(int)($_POST['id']??0);$username=trim($_POST['username']??'');$name=trim($_POST['name']??'');$email=trim($_POST['email']??'');$role=$_POST['role']??'';$status=$_POST['status']??'Active';
+            if($id===(int)$_SESSION['user']['id']){$me=$model->find($id);$role=$me['role'];$status=$me['status'];}
+            if(!preg_match('/^[A-Za-z0-9_.-]{3,30}$/',$username)||!preg_match('/^[A-Za-z][A-Za-z .\'-]{1,99}$/',$name)||!filter_var($email,FILTER_VALIDATE_EMAIL)||!in_array($role,$roles,true)||!in_array($status,$statuses,true)){flash('error','Please enter valid user information.');redirect_to(project_base_url().'/admin/users.php'.($id?'?edit='.$id:''));}
+            try{if($id){$model->update($id,compact('username','name','email','role','status'));if($id===(int)$_SESSION['user']['id']){$_SESSION['user']['username']=$username;$_SESSION['user']['name']=$name;$_SESSION['user']['email']=$email;}flash('success','User updated successfully.');}else{$model->create(compact('username','name','email','role','status')+['password'=>'123']);flash('success','User added successfully. The initial password is set by the system.');}}catch(PDOException $e){flash('error','Username or email already exists.');}
+            redirect_to(project_base_url().'/admin/users.php');
+        }
+        $users=$model->all();$title='User Management';require __DIR__.'/../views/admin/users.php';
+    }
+    public function products(): void { $model=new ProductModel($this->pdo);$edit=null;if(isset($_GET['edit'])){$edit=$model->find((int)$_GET['edit']);if(!$edit){flash('error','Product not found.');redirect_to(project_base_url().'/admin/products.php');}}
+        if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_id'])){verify_csrf();try{$model->delete((int)$_POST['delete_id']);flash('success','Product deleted successfully.');}catch(PDOException $e){flash('error','This product cannot be deleted because it is used in existing sales or purchases.');}redirect_to(project_base_url().'/admin/products.php');}
+        if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$id=(int)($_POST['id']??0);$d=['name'=>trim($_POST['name']??''),'sku'=>trim($_POST['sku']??''),'category_id'=>((int)($_POST['category_id']??0))?:null,'price'=>(float)($_POST['price']??-1),'quantity'=>(int)($_POST['quantity']??-1),'reorder_level'=>(int)($_POST['reorder_level']??-1)];if(!preg_match('/^[A-Za-z0-9][A-Za-z0-9 ._-]{1,149}$/',$d['name'])||!preg_match('/^[A-Za-z0-9_-]{2,80}$/',$d['sku'])||$d['price']<0||$d['quantity']<0||$d['reorder_level']<0){flash('error','Please enter valid product information.');redirect_to(project_base_url().'/admin/products.php'.($id?'?edit='.$id:''));}try{if($id){$model->update($id,$d);flash('success','Product updated successfully.');}else{$model->create($d);flash('success','Product added successfully.');}}catch(PDOException $e){flash('error','SKU already exists or the product could not be saved.');}redirect_to(project_base_url().'/admin/products.php');}
+        $cats=$model->categories();$ps=$model->all();$title='Product Management';require __DIR__.'/../views/admin/products.php';
+    }
+    public function categories(): void { $model=new CategoryModel($this->pdo);$edit=null;if(isset($_GET['edit'])){$edit=$model->find((int)$_GET['edit']);if(!$edit){flash('error','Category not found.');redirect_to(project_base_url().'/admin/categories.php');}}if($_SERVER['REQUEST_METHOD']==='POST' && isset($_POST['delete_id'])){verify_csrf();try{$model->delete((int)$_POST['delete_id']);flash('success','Category deleted.');}catch(PDOException $e){flash('error','Category could not be deleted.');}redirect_to(project_base_url().'/admin/categories.php');}if($_SERVER['REQUEST_METHOD']==='POST'){verify_csrf();$id=(int)($_POST['id']??0);$name=trim($_POST['name']??'');if(!preg_match('/^[A-Za-z][A-Za-z &_-]{1,99}$/',$name)){flash('error','Category name must contain valid letters and spaces.');redirect_to(project_base_url().'/admin/categories.php'.($id?'?edit='.$id:''));}try{$model->save($id?:null,$name);flash('success',$id?'Category updated successfully.':'Category added successfully.');}catch(PDOException $e){flash('error','Category name already exists.');}redirect_to(project_base_url().'/admin/categories.php');}$cs=$model->all();$title='Category Management';require __DIR__.'/../views/admin/categories.php'; }
+    public function reports(): void { $summary=(new AdminModel($this->pdo))->reportSummary();$title='Reports';require __DIR__.'/../views/admin/reports.php'; }
+}
