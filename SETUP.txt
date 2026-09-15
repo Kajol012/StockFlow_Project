@@ -1,0 +1,23 @@
+STOCKFLOW - QUICK SETUP
+
+1. Extract this folder as C:\xampp\htdocs\StockFlow
+2. Start Apache and MySQL in XAMPP.
+3. Open phpMyAdmin -> Import -> database\StockSystem.sql
+4. Open: http://localhost/StockFlow/
+5. Login:
+   Admin              : admin / 123
+   Inventory Manager  : inventory manager / 222
+   Purchase Officer   : purchase officer / 333
+   Staff (Sales)      : staff / 444
+
+Database: StockSystem
+MySQL user: root
+MySQL password: empty (default XAMPP)
+
+ROLE FOLDERS:
+admin/
+inventory_manager/
+purchase_officer/
+staff/
+
+The existing Admin module is retained in the admin area; the other three role modules are added around the same MVC/database system.
