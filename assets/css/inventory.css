@@ -1,0 +1,27 @@
+.page-head { margin-bottom: 1.25rem; }
+.page-head h2 { margin: 0 0 .25rem; }
+
+.filter-bar { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; }
+.filter-bar input, .filter-bar select { padding: .5rem .65rem; border: 1px solid #d8dce1; border-radius: 6px; font-size: .9rem; }
+
+.table-wrap { overflow-x: auto; border: 1px solid #e3e6ea; border-radius: 8px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.data-table th, .data-table td { padding: .65rem .85rem; text-align: left; border-bottom: 1px solid #eef0f2; }
+.data-table thead th { background: #fafbfc; font-weight: 600; color: #4b5563; }
+.data-table tbody tr:hover { background: #fafbfc; }
+
+.badge { display: inline-block; padding: .2rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+.badge-success { background: #e6f6ec; color: #1c7c3f; }
+.badge-warning { background: #fff4e0; color: #a15c00; }
+.badge-danger  { background: #fde8e8; color: #b91c1c; }
+.badge-neutral { background: #eef0f2; color: #4b5563; }
+
+.stat-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
+.stat-card { flex: 1 1 160px; border: 1px solid #e3e6ea; border-radius: 8px; padding: 1rem 1.25rem; }
+.stat-num { display: block; font-size: 1.8rem; font-weight: 700; }
+.stat-label { color: #6b7280; font-size: .85rem; }
+
+.card-form { max-width: 480px; border: 1px solid #e3e6ea; border-radius: 8px; padding: 1.25rem; }
+.card-form .field { margin-bottom: 1rem; }
+
+.btn-sm { padding: .3rem .6rem; font-size: .8rem; }
